@@ -94,5 +94,30 @@ namespace InterviewTest.Controllers
             }
             return true;
         }
+        [HttpPost]
+        [Route("[action]")]
+        public Employee AmendEmployee(AmendEmployee input)
+        {
+            Employee employee = new Employee();
+
+            var connectionStringBuilder = new SqliteConnectionStringBuilder() { DataSource = "./SqliteDB.db" };
+            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+            {
+                connection.Open();
+
+                var sqlCmd = connection.CreateCommand();
+                sqlCmd.CommandText = @"UPDATE Employees
+                                       SET Name = @newName, Value = @value
+                                       Where Name = @name";
+                var parameters = new List<SqliteParameter>() { new SqliteParameter("name", input.name), new SqliteParameter("value", input.value), new SqliteParameter("newName", input.newName) };
+                sqlCmd.Parameters.AddRange(parameters);
+                sqlCmd.ExecuteNonQuery();
+            }
+
+
+            //Response.StatusCode = 404;
+            
+            return employee;
+        }
     }
 }
