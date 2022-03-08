@@ -14,28 +14,58 @@ namespace InterviewTest.Controllers
         public List<Employee> Get()
         {
             var employees = new List<Employee>();
+            try
+            {
+                var connectionStringBuilder = new SqliteConnectionStringBuilder() { DataSource = "./SqliteDB.db" };
+                using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+                {
+                    connection.Open();
+
+                    var queryCmd = connection.CreateCommand();
+                    queryCmd.CommandText = @"SELECT Name, Value FROM Employees";
+                    using (var reader = queryCmd.ExecuteReader())
+                    {
+                        while (reader.Read())
+                        {
+                            employees.Add(new Employee
+                            {
+                                Name = reader.GetString(0),
+                                Value = reader.GetInt32(1)
+                            });
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                Response.StatusCode = 500;
+            }
+
+            return employees;
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public Employee CreateEmployee(Employee input)
+        {
+
+            Employee employee = new Employee();
 
             var connectionStringBuilder = new SqliteConnectionStringBuilder() { DataSource = "./SqliteDB.db" };
             using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
             {
                 connection.Open();
 
-                var queryCmd = connection.CreateCommand();
-                queryCmd.CommandText = @"SELECT Name, Value FROM Employees";
-                using (var reader = queryCmd.ExecuteReader())
-                {
-                    while (reader.Read())
-                    {
-                        employees.Add(new Employee
-                        {
-                            Name = reader.GetString(0),
-                            Value = reader.GetInt32(1)
-                        });
-                    }
-                }
+                var sqlCmd = connection.CreateCommand();
+                sqlCmd.CommandText = @"Insert into Employees(Name, Value)
+                                       Values(@name, @value)";
+                var parameters = new List<SqliteParameter>() { new SqliteParameter("name", input.Name), new SqliteParameter("value", input.Value) };
+                sqlCmd.Parameters.AddRange(parameters);
+                sqlCmd.ExecuteNonQuery();
             }
 
-            return employees;
+
+            return employee;
         }
 
         [HttpGet]
@@ -113,9 +143,6 @@ namespace InterviewTest.Controllers
                 sqlCmd.Parameters.AddRange(parameters);
                 sqlCmd.ExecuteNonQuery();
             }
-
-
-            //Response.StatusCode = 404;
             
             return employee;
         }

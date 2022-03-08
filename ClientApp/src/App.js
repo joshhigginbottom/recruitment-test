@@ -3,7 +3,9 @@ import React, { Component } from 'react';
 export default class App extends Component {
     constructor(props) {
         super(props);
-        this.state = { data: [], Abc: [] }
+        this.state = {
+            data: [], Abc: [], newEmployee: { name:"", value:"" }
+        }
     }
 
     componentDidMount() {
@@ -50,6 +52,24 @@ export default class App extends Component {
             });
     }
 
+    createEmployee = () => {
+        const data = {
+            Name: this.state.newEmployee.name, Value: this.state.newEmployee.value
+        }
+
+        const payload = {
+            method: 'POST', body: JSON.stringify(data), headers: { 'Content-Type': 'application/json' }
+        }
+        fetch('Employees/CreateEmployee', payload)
+            .then(Response => {
+                if (Response.ok) {
+                    this.refreshData();
+                    this.setState({ newEmployee: {name:"",value:""} });
+                    return Response;
+                }
+            });
+    }
+
     addToValue = () => {
         const payload = { method: 'PATCH' }
         fetch('/Employees/AddToValue', payload)
@@ -86,6 +106,24 @@ export default class App extends Component {
         });
     }
 
+    changeNewEmployeeNameHandler = (e) => {
+        e.persist()
+        this.setState((state) => {
+            const newEmployee = this.state.newEmployee;
+            newEmployee.name = e.target.value;
+            return { newEmployee: newEmployee }
+        });
+    }
+
+    changeNewEmployeeValueHandler = (e) => {
+        e.persist()
+        this.setState((state) => {
+            const newEmployee = this.state.newEmployee;
+            newEmployee.value = e.target.value;
+            return { newEmployee: newEmployee }
+        });
+    }
+
     render() {
         return (
             <>
@@ -106,8 +144,9 @@ export default class App extends Component {
                                 </tr>
                             )}
                             <tr>
-                                <td></td>
-                                <td></td>
+                                <td><input value={this.state.newEmployee.name} onChange={this.changeNewEmployeeNameHandler} /></td>
+                                <td><input value={this.state.newEmployee.value} onChange={this.changeNewEmployeeValueHandler } /></td>
+                                <td><button onClick={this.createEmployee}>Create</button></td>
                             </tr>
                         </tbody>
                     </table>
