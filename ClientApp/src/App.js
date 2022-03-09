@@ -8,6 +8,7 @@ export default class App extends Component {
         }
     }
 
+    //Ensure data is loaded on component load
     componentDidMount() {
         this.refreshData();
     }
@@ -145,11 +146,11 @@ export default class App extends Component {
             <>
                 <button key='btn_AddToValue' onClick={this.addToValue}>AddToValue</button>
                 <div>
-                    <table style={{ float: "left" }} key='tbl_Data' className='table table-striped' aria-labelledby="tabelLabel">
+                    <table style={{ float: "left", padding: "1em" }}>
                         <thead>
                             <tr>
-                                <th>Name</th>
-                                <th>Value</th>
+                                <th style={{ textAlign: "left" }}>Name</th>
+                                <th style={{ textAlign: "left" }}>Value</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -167,19 +168,19 @@ export default class App extends Component {
                             </tr>
                         </tbody>
                     </table>
-                    <table style={{ float: "left" }} key='tbl_ABC' className='table table-striped' aria-labelledby="tabelLabel">
+                    <table style={{ float: "left", padding: "1em" }}>
                         <thead>
                             <tr>
-                                <th>A-B-C values above 11171</th>
+                                <th>A-B-C total values above 11171</th>
                             </tr>
                             <tr>
-                                <th>Letter</th>
-                                <th>Value</th>
+                                <th style={{ textAlign: "left" }}>Letter</th>
+                                <th style={{ textAlign: "left" }}>Value</th>
                             </tr>
                         </thead>
                         <tbody>
                             {this.state.Abc.map(item =>
-                                <tr style={ { alignLeft:"true" } } key={item.letter}>
+                                <tr key={item.letter}>
                                     <td>{item.letter}</td>
                                     <td>{item.value}</td>
                                 </tr>
