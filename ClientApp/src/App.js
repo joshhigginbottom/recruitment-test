@@ -82,6 +82,22 @@ export default class App extends Component {
             });
     }
 
+    removeEmployee = (indexName) => {
+        const data = {
+            name: indexName
+        }
+
+        const payload = {
+            method: 'POST', body: JSON.stringify(data), headers: { 'Content-Type': 'application/json' }
+        }
+        fetch('Employees/RemoveEmployee', payload)
+            .then(Response => {
+                if (Response.ok) {
+                    this.refreshData();
+                    return Response;
+                }
+            });
+    }
 
     //Refresh data of both tables
     refreshData = () => {
@@ -141,6 +157,7 @@ export default class App extends Component {
                                 <tr key={index}>
                                     <td><input value={item.name || ''} onChange={(e) => this.changeNameHandler(index, e.target.value)} onBlur={(e) => this.updateEmployee(item.indexName, e.target.value, item.value)} /></td>
                                     <td><input value={item.value || ''} onChange={(e) => this.changeValueHandler(index, e.target.value)} onBlur={(e) => this.updateEmployee(item.indexName, item.name, e.target.value)} /></td>
+                                    <td><button onClick={() => this.removeEmployee(item.indexName)}>Remove</button></td>
                                 </tr>
                             )}
                             <tr>
@@ -153,13 +170,16 @@ export default class App extends Component {
                     <table style={{ float: "left" }} key='tbl_ABC' className='table table-striped' aria-labelledby="tabelLabel">
                         <thead>
                             <tr>
+                                <th>A-B-C values above 11171</th>
+                            </tr>
+                            <tr>
                                 <th>Letter</th>
                                 <th>Value</th>
                             </tr>
                         </thead>
                         <tbody>
                             {this.state.Abc.map(item =>
-                                <tr key={item.letter}>
+                                <tr style={ { alignLeft:"true" } } key={item.letter}>
                                     <td>{item.letter}</td>
                                     <td>{item.value}</td>
                                 </tr>

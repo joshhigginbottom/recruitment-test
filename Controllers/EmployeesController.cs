@@ -14,31 +14,25 @@ namespace InterviewTest.Controllers
         public List<Employee> Get()
         {
             var employees = new List<Employee>();
-            try
-            {
-                var connectionStringBuilder = new SqliteConnectionStringBuilder() { DataSource = "./SqliteDB.db" };
-                using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
-                {
-                    connection.Open();
 
-                    var queryCmd = connection.CreateCommand();
-                    queryCmd.CommandText = @"SELECT Name, Value FROM Employees";
-                    using (var reader = queryCmd.ExecuteReader())
+            var connectionStringBuilder = new SqliteConnectionStringBuilder() { DataSource = "./SqliteDB.db" };
+            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+            {
+                connection.Open();
+
+                var queryCmd = connection.CreateCommand();
+                queryCmd.CommandText = @"SELECT Name, Value FROM Employees";
+                using (var reader = queryCmd.ExecuteReader())
+                {
+                    while (reader.Read())
                     {
-                        while (reader.Read())
+                        employees.Add(new Employee
                         {
-                            employees.Add(new Employee
-                            {
-                                Name = reader.GetString(0),
-                                Value = reader.GetInt32(1)
-                            });
-                        }
+                            Name = reader.GetString(0),
+                            Value = reader.GetInt32(1)
+                        });
                     }
                 }
-            }
-            catch
-            {
-                Response.StatusCode = 500;
             }
 
             return employees;
@@ -80,7 +74,7 @@ namespace InterviewTest.Controllers
                 connection.Open();
 
                 var queryCmd = connection.CreateCommand();
-                queryCmd.CommandText =      @"select SUBSTR(NAME,1,1), SUM(VALUE)
+                queryCmd.CommandText = @"select SUBSTR(NAME,1,1), SUM(VALUE)
                                             from employees
                                             where SUBSTR(NAME,1,1) in ('A','B','C')
                                             group by SUBSTR(NAME,1,1)
@@ -143,8 +137,29 @@ namespace InterviewTest.Controllers
                 sqlCmd.Parameters.AddRange(parameters);
                 sqlCmd.ExecuteNonQuery();
             }
-            
+
             return employee;
+        }
+
+        [HttpPost]
+        [Route("[action]")]
+        public bool RemoveEmployee(DeleteEmployee employee)
+        {
+
+            var connectionStringBuilder = new SqliteConnectionStringBuilder() { DataSource = "./SqliteDB.db" };
+            using (var connection = new SqliteConnection(connectionStringBuilder.ConnectionString))
+            {
+                connection.Open();
+
+                var sqlCmd = connection.CreateCommand();
+                sqlCmd.CommandText = @"delete from Employees
+                                       Where Name = @name";
+                var parameters = new List<SqliteParameter>() { new SqliteParameter("name", employee.name) };
+                sqlCmd.Parameters.AddRange(parameters);
+                sqlCmd.ExecuteNonQuery();
+            }
+
+            return true;
         }
     }
 }
